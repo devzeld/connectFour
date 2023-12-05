@@ -1,5 +1,6 @@
 package me.zeld;
 
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -9,12 +10,16 @@ public class Board {
     private final char[][] BOARD = new char[ROWS][COLS];
     private final char defaultEmptySpace, blueToken, redToken;
     private String player1Name, player2Name;
-    private int turn = 0;
+    private int turn;
 
     public Board(boolean vsHuman) {
         defaultEmptySpace = '□';
+        //si può usare anche lo spazio che è più capibile:
+        // defaultEmptySpace = ' ';
         blueToken = '●';
         redToken = '○';
+        turn = 0;
+        Random r = new Random();
 
         startGame();
     }
@@ -31,7 +36,7 @@ public class Board {
         System.out.println("┌------ FORZA QUATTRO ------┐");
         for (int i = 0; i < ROWS; i++) {
             System.out.print("| ");
-            /* per aggiungere una specie di caricamento (animazione)
+            /* per aggiungere una specie di animazione (loading...)
             try {
                 TimeUnit.MILLISECONDS.sleep(210);
             } catch (InterruptedException e) {
@@ -117,22 +122,23 @@ public class Board {
     }
 
     private void setPlayerNames() {
-        Scanner scStr = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
         System.out.print("-Giocatore Uno: ");
-        player1Name = scStr.next();
+        player1Name = sc.next();
         if (player1Name.charAt(0) >= 97 && player1Name.charAt(0) <= 122) {
-            player1Name = player1Name.replace(player1Name.charAt(0), (char) ((char) (int) player1Name.charAt(0) - 32));
+            player1Name = player1Name.replace(player1Name.charAt(0), (char) (player1Name.charAt(0) - 32));
         }
         System.out.print("-Giocatore Due: ");
-        player2Name = scStr.next();
+        System.out.print("\r");
+        player2Name = sc.next();
         if (player2Name.charAt(0) >= 97 && player2Name.charAt(0) <= 122) {
-            player2Name = player2Name.replace(player2Name.charAt(0), (char) ((char) (int) player2Name.charAt(0) - 32));
+            player2Name = player2Name.replace(player2Name.charAt(0), (char) (player2Name.charAt(0) - 32));
         }
         while (player1Name.equals(player2Name)) {
-            System.out.print("-Giocatore Due: ");
-            player2Name = scStr.next();
+            System.out.print("Il nome da lei inserito non è valido, lo reinserisca per piacere.\nGiocatore Due: ");
+            player2Name = sc.next();
             if (player2Name.charAt(0) >= 97 && player2Name.charAt(0) <= 122) {
-                player2Name = player2Name.replace(player2Name.charAt(0), (char) ((char) (int) player2Name.charAt(0) - 32));
+                player2Name = player2Name.replace(player2Name.charAt(0), (char)(player2Name.charAt(0) - 32));
             }
         }
     }
@@ -159,5 +165,4 @@ public class Board {
             }
         }
     }
-
 }
