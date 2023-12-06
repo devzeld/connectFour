@@ -1,6 +1,5 @@
 package me.zeld;
 
-import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -8,20 +7,25 @@ public class Board {
     private final int ROWS = 6;
     private final int COLS = 7;
     private final char[][] BOARD = new char[ROWS][COLS];
-    private final char defaultEmptySpace, blueToken, redToken;
+    private final char defaultEmptySpace, humanToken, otherToken;
     private String player1Name, player2Name;
+    private final boolean versusHuman;
     private int turn;
 
     public Board(boolean vsHuman) {
         defaultEmptySpace = '□';
         //si può usare anche lo spazio che è più capibile:
-        // defaultEmptySpace = ' ';
-        blueToken = '●';
-        redToken = '○';
+        //defaultEmptySpace = ' ';
+        humanToken = '●';
+        otherToken = '○';
+        versusHuman = vsHuman;
         turn = 0;
-        Random r = new Random();
 
         startGame();
+    }
+
+    private boolean thereIsToken(int row, int col){
+        return BOARD[row][col] == defaultEmptySpace;
     }
 
     private void initializeBoard() {
@@ -51,24 +55,26 @@ public class Board {
         System.out.println("└---------------------------┘");
     }
 
-    private void insertDisc(int col) {
+    private boolean insertDisc(int col) {
         for (int i = ROWS - 1; i >= 0; i--) {
-            if (BOARD[i][col] == defaultEmptySpace) {
-                BOARD[i][col] = turn % 2 == 0 ? redToken : blueToken;
-                break;
+            if (thereIsToken(i,col)) {
+                BOARD[i][col] = turn % 2 == 0 ? otherToken : humanToken;
+                return true;
             }
         }
+        return false;
     }
 
-    private boolean winCondition() {
+    private char winCondition() {
+        char winnerToken = 0;
         //verticale
         for (int i = 0; i < ROWS - 3; i++) {
             for (int j = 0; j < COLS; j++) {
                 if (BOARD[i][j] == BOARD[i + 1][j] &&
                         BOARD[i][j] == BOARD[i + 2][j] &&
                         BOARD[i][j] == BOARD[i + 3][j] &&
-                        BOARD[i][j] != defaultEmptySpace) {
-                    return true;
+                        !thereIsToken(i,j)) {
+                    winnerToken = BOARD[i][j];
                 }
             }
         }
@@ -78,8 +84,8 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i][j + 1] &&
                         BOARD[i][j] == BOARD[i][j + 2] &&
                         BOARD[i][j] == BOARD[i][j + 3] &&
-                        BOARD[i][j] != defaultEmptySpace) {
-                    return true;
+                        !thereIsToken(i,j)) {
+                    winnerToken = BOARD[i][j];
                 }
             }
         }
@@ -89,8 +95,8 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i - 1][j + 1] &&
                         BOARD[i][j] == BOARD[i - 2][j + 2] &&
                         BOARD[i][j] == BOARD[i - 3][j + 3] &&
-                        BOARD[i][j] != defaultEmptySpace) {
-                    return true;
+                        !thereIsToken(i,j)) {
+                    winnerToken = BOARD[i][j];
                 }
             }
         }
@@ -99,47 +105,46 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i + 1][j + 1] &&
                         BOARD[i][j] == BOARD[i + 2][j + 2] &&
                         BOARD[i][j] == BOARD[i + 3][j + 3] &&
-                        BOARD[i][j] != defaultEmptySpace) {
-                    return true;
+                        !thereIsToken(i,j)) {
+                    winnerToken = BOARD[i][j];
                 }
             }
         }
-        return false;
+        for (int i = 0; i < COLS; i++) {
+            if (BOARD[ROWS - 1][i] == defaultEmptySpace) {
+                winnerToken = defaultEmptySpace;
+                break;
+            }
+        }
+
+        return winnerToken;
     }
 
     private void userChoice() {
         Scanner sc = new Scanner(System.in);
         System.out.print("Inserisci la colonna dove inserire il token(DA 1 A 7): ");
         int userChoice = sc.nextInt();
-        while (userChoice < 1 || userChoice > 7) {
+        while (userChoice < 1 || userChoice > 7 || !insertDisc(userChoice - 1)) {
+            System.out.print("Numero inserito non valido.\nInserisci la colonna dove inserire il token(DA 1 A 7): ");
             userChoice = sc.nextInt();
         }
-        insertDisc(userChoice - 1);
-    }
-
-    private void botChoice() {
-        //insertDisc();
     }
 
     private void setPlayerNames() {
         Scanner sc = new Scanner(System.in);
         System.out.print("-Giocatore Uno: ");
         player1Name = sc.next();
-        if (player1Name.charAt(0) >= 97 && player1Name.charAt(0) <= 122) {
-            player1Name = player1Name.replace(player1Name.charAt(0), (char) (player1Name.charAt(0) - 32));
-        }
+        player1Name = player1Name.substring(0,1).toUpperCase() + player1Name.substring(1);
+
         System.out.print("-Giocatore Due: ");
         System.out.print("\r");
         player2Name = sc.next();
-        if (player2Name.charAt(0) >= 97 && player2Name.charAt(0) <= 122) {
-            player2Name = player2Name.replace(player2Name.charAt(0), (char) (player2Name.charAt(0) - 32));
-        }
+        player2Name = player2Name.substring(0,1).toUpperCase() + player2Name.substring(1);
+
         while (player1Name.equals(player2Name)) {
             System.out.print("Il nome da lei inserito non è valido, lo reinserisca per piacere.\nGiocatore Due: ");
             player2Name = sc.next();
-            if (player2Name.charAt(0) >= 97 && player2Name.charAt(0) <= 122) {
-                player2Name = player2Name.replace(player2Name.charAt(0), (char)(player2Name.charAt(0) - 32));
-            }
+            player2Name = player2Name.substring(0,1).toUpperCase() + player2Name.substring(1);
         }
     }
 
@@ -147,10 +152,11 @@ public class Board {
         initializeBoard();
         setPlayerNames();
         printBoard();
+
         for (int i = 0; i < ROWS * COLS; i++) {
             turn = i + 1;
             System.out.printf("Turno numero %s\n", turn);
-            System.out.printf("%s (%s), tocca a te!\n", turn % 2 == 0 ? player1Name : player2Name, turn % 2 == 0 ? redToken : blueToken);
+            System.out.printf("%s (%s), tocca a te!\n", turn % 2 == 0 ? player1Name : player2Name, turn % 2 == 0 ? otherToken : humanToken);
             userChoice();
             try {
                 TimeUnit.MILLISECONDS.sleep(60);
@@ -159,10 +165,17 @@ public class Board {
             }
             System.out.print("\r");
             printBoard();
-            if (winCondition()) {
+            if (winCondition() == humanToken || winCondition() == otherToken) {
                 System.out.printf("%s hai vinto!", turn % 2 == 0 ? player1Name : player2Name);
-                break;
+                return;
             }
         }
+    }
+
+    public class MiniMaxBot{
+        public MiniMaxBot(){
+
+        }
+
     }
 }
