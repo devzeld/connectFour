@@ -13,8 +13,8 @@ public class Board {
     private int turn;
 
     public Board(boolean vsHuman) {
-        defaultEmptySpace = '□';
-        //si può usare anche lo spazio che è più capibile:
+        defaultEmptySpace = ' ';
+        //si può usare anche lo spazio che si capisce di più:
         //defaultEmptySpace = ' ';
         humanToken = '●';
         otherToken = '○';
@@ -110,6 +110,7 @@ public class Board {
                 }
             }
         }
+
         for (int i = 0; i < COLS; i++) {
             if (BOARD[ROWS - 1][i] == defaultEmptySpace) {
                 winnerToken = defaultEmptySpace;
@@ -118,6 +119,53 @@ public class Board {
         }
 
         return winnerToken;
+    }
+
+    private boolean hasWon() {
+        //verticale
+        for (int i = 0; i < ROWS - 3; i++) {
+            for (int j = 0; j < COLS; j++) {
+                if (BOARD[i][j] == BOARD[i + 1][j] &&
+                        BOARD[i][j] == BOARD[i + 2][j] &&
+                        BOARD[i][j] == BOARD[i + 3][j] &&
+                        !thereIsToken(i,j)) {
+                    return true;
+                }
+            }
+        }
+        //orizzontale
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j] == BOARD[i][j + 1] &&
+                        BOARD[i][j] == BOARD[i][j + 2] &&
+                        BOARD[i][j] == BOARD[i][j + 3] &&
+                        !thereIsToken(i,j)) {
+                    return true;
+                }
+            }
+        }
+        //diagonali
+        for (int i = 3; i < ROWS; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j] == BOARD[i - 1][j + 1] &&
+                        BOARD[i][j] == BOARD[i - 2][j + 2] &&
+                        BOARD[i][j] == BOARD[i - 3][j + 3] &&
+                        !thereIsToken(i,j)) {
+                    return true;
+                }
+            }
+        }
+        for (int i = 0; i < ROWS - 3; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j] == BOARD[i + 1][j + 1] &&
+                        BOARD[i][j] == BOARD[i + 2][j + 2] &&
+                        BOARD[i][j] == BOARD[i + 3][j + 3] &&
+                        !thereIsToken(i,j)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void userChoice() {
@@ -165,7 +213,7 @@ public class Board {
             }
             System.out.print("\r");
             printBoard();
-            if (winCondition() == humanToken || winCondition() == otherToken) {
+            if (/*winCondition() == humanToken || winCondition() == otherToken*/ hasWon()) {
                 System.out.printf("%s hai vinto!", turn % 2 == 0 ? player1Name : player2Name);
                 return;
             }
