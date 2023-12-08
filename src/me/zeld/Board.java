@@ -13,8 +13,9 @@ public class Board {
     private int turn;
 
     public Board(boolean vsHuman) {
-        defaultEmptySpace = ' ';
-        //si può usare anche lo spazio che si capisce di più:
+        defaultEmptySpace = '■';
+        //ci sono anche altre alternative per lo spazio vuoto:
+        //defaultEmptySpace = '≡';
         //defaultEmptySpace = ' ';
         humanToken = '●';
         otherToken = '○';
@@ -63,62 +64,6 @@ public class Board {
             }
         }
         return false;
-    }
-
-    private char winCondition() {
-        char winnerToken = 0;
-        //verticale
-        for (int i = 0; i < ROWS - 3; i++) {
-            for (int j = 0; j < COLS; j++) {
-                if (BOARD[i][j] == BOARD[i + 1][j] &&
-                        BOARD[i][j] == BOARD[i + 2][j] &&
-                        BOARD[i][j] == BOARD[i + 3][j] &&
-                        !thereIsToken(i,j)) {
-                    winnerToken = BOARD[i][j];
-                }
-            }
-        }
-        //orizzontale
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLS - 3; j++) {
-                if (BOARD[i][j] == BOARD[i][j + 1] &&
-                        BOARD[i][j] == BOARD[i][j + 2] &&
-                        BOARD[i][j] == BOARD[i][j + 3] &&
-                        !thereIsToken(i,j)) {
-                    winnerToken = BOARD[i][j];
-                }
-            }
-        }
-        //diagonali
-        for (int i = 3; i < ROWS; i++) {
-            for (int j = 0; j < COLS - 3; j++) {
-                if (BOARD[i][j] == BOARD[i - 1][j + 1] &&
-                        BOARD[i][j] == BOARD[i - 2][j + 2] &&
-                        BOARD[i][j] == BOARD[i - 3][j + 3] &&
-                        !thereIsToken(i,j)) {
-                    winnerToken = BOARD[i][j];
-                }
-            }
-        }
-        for (int i = 0; i < ROWS - 3; i++) {
-            for (int j = 0; j < COLS - 3; j++) {
-                if (BOARD[i][j] == BOARD[i + 1][j + 1] &&
-                        BOARD[i][j] == BOARD[i + 2][j + 2] &&
-                        BOARD[i][j] == BOARD[i + 3][j + 3] &&
-                        !thereIsToken(i,j)) {
-                    winnerToken = BOARD[i][j];
-                }
-            }
-        }
-
-        for (int i = 0; i < COLS; i++) {
-            if (BOARD[ROWS - 1][i] == defaultEmptySpace) {
-                winnerToken = defaultEmptySpace;
-                break;
-            }
-        }
-
-        return winnerToken;
     }
 
     private boolean hasWon() {
@@ -200,7 +145,6 @@ public class Board {
         initializeBoard();
         setPlayerNames();
         printBoard();
-
         for (int i = 0; i < ROWS * COLS; i++) {
             turn = i + 1;
             System.out.printf("Turno numero %s\n", turn);
@@ -213,17 +157,10 @@ public class Board {
             }
             System.out.print("\r");
             printBoard();
-            if (/*winCondition() == humanToken || winCondition() == otherToken*/ hasWon()) {
+            if (hasWon()) {
                 System.out.printf("%s hai vinto!", turn % 2 == 0 ? player1Name : player2Name);
                 return;
             }
         }
-    }
-
-    public class MiniMaxBot{
-        public MiniMaxBot(){
-
-        }
-
     }
 }
