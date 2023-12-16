@@ -26,7 +26,7 @@ public class Board {
     }
 
 
-// ----------------------------- BOARD -----------------------------
+    // ----------------------------- BOARD -----------------------------
     private void initializeBoard() {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
@@ -55,7 +55,7 @@ public class Board {
     }
 
 
-// ----------------------------- CHECKS -----------------------------
+    // ----------------------------- CHECKS -----------------------------
     private boolean insertDisc(int col) {
         for (int i = ROWS - 1; i >= 0; i--) {
             if (thereIsToken(i,col)) {
@@ -121,7 +121,7 @@ public class Board {
         return false;
     }
 
-// ----------------------------- BOT SETTING -----------------------------
+    // ----------------------------- BOT SETTING -----------------------------
     private boolean checkVertical(int col, char tokenType){
         int counter = 0;
         int i;
@@ -189,7 +189,7 @@ public class Board {
     }
 
 
-// ----------------------------- GAME -----------------------------
+    // ----------------------------- GAME -----------------------------
     public void startGame() {
         initializeBoard();
         setPlayerNames();
