@@ -13,10 +13,10 @@ public class Board {
     private int turn;
 
     public Board(boolean vsHuman) {
-        defaultEmptySpace = '■';
+//        defaultEmptySpace = '■';
         //ci sono anche altre alternative per lo spazio vuoto:
         //defaultEmptySpace = '≡';
-        //defaultEmptySpace = ' ';
+        defaultEmptySpace = ' ';
         humanToken = '●';
         otherToken = '○';
         versusHuman = vsHuman;
@@ -25,10 +25,8 @@ public class Board {
         startGame();
     }
 
-    private boolean thereIsToken(int row, int col){
-        return BOARD[row][col] == defaultEmptySpace;
-    }
 
+// ----------------------------- BOARD -----------------------------
     private void initializeBoard() {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
@@ -40,14 +38,14 @@ public class Board {
     private void printBoard() {
         System.out.println("┌------ FORZA QUATTRO ------┐");
         for (int i = 0; i < ROWS; i++) {
-            System.out.print("| ");
             /* per aggiungere una specie di animazione (loading...)
-            try {
-                TimeUnit.MILLISECONDS.sleep(210);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+                try {
+                    TimeUnit.MILLISECONDS.sleep(210);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             */
+            System.out.print("| ");
             for (int j = 0; j < COLS; j++) {
                 System.out.print(BOARD[i][j] + " | ");
             }
@@ -56,6 +54,8 @@ public class Board {
         System.out.println("└---------------------------┘");
     }
 
+
+// ----------------------------- CHECKS -----------------------------
     private boolean insertDisc(int col) {
         for (int i = ROWS - 1; i >= 0; i--) {
             if (thereIsToken(i,col)) {
@@ -66,7 +66,12 @@ public class Board {
         return false;
     }
 
+    private boolean thereIsToken(int row, int col){
+        return BOARD[row][col] == defaultEmptySpace;
+    }
+
     private boolean hasWon() {
+
         //verticale
         for (int i = 0; i < ROWS - 3; i++) {
             for (int j = 0; j < COLS; j++) {
@@ -78,6 +83,7 @@ public class Board {
                 }
             }
         }
+
         //orizzontale
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS - 3; j++) {
@@ -89,6 +95,7 @@ public class Board {
                 }
             }
         }
+
         //diagonali
         for (int i = 3; i < ROWS; i++) {
             for (int j = 0; j < COLS - 3; j++) {
@@ -100,6 +107,7 @@ public class Board {
                 }
             }
         }
+
         for (int i = 0; i < ROWS - 3; i++) {
             for (int j = 0; j < COLS - 3; j++) {
                 if (BOARD[i][j] == BOARD[i + 1][j + 1] &&
@@ -113,6 +121,24 @@ public class Board {
         return false;
     }
 
+    private boolean checkVertical(int col,char tokenType){
+        int counter = 0;
+        int i;
+        for (i = ROWS - 1; i > 0 && BOARD[i][col] != '-'; i--) {
+            if(BOARD[i][col] == tokenType){
+                counter++;
+            }else{
+                counter = 0;
+            }
+        }
+        if(counter == 3 && BOARD[i][col] == '-'){
+            return true;
+        }
+        return false;
+    }
+
+
+// ----------------------------- USER INFO -----------------------------
     private void userChoice() {
         Scanner sc = new Scanner(System.in);
         System.out.print("Inserisci la colonna dove inserire il token(DA 1 A 7): ");
@@ -123,33 +149,60 @@ public class Board {
         }
     }
 
+    private void botChoice(){
+
+    }
+
     private void setPlayerNames() {
         Scanner sc = new Scanner(System.in);
-        System.out.print("-Giocatore Uno: ");
+        System.out.print(versusHuman ? "-Giocatore Uno: " : "Nome Giocatore: ");
         player1Name = sc.next();
         player1Name = player1Name.substring(0,1).toUpperCase() + player1Name.substring(1);
 
-        System.out.print("-Giocatore Due: ");
-        System.out.print("\r");
-        player2Name = sc.next();
-        player2Name = player2Name.substring(0,1).toUpperCase() + player2Name.substring(1);
-
-        while (player1Name.equals(player2Name)) {
-            System.out.print("Il nome da lei inserito non è valido, lo reinserisca per piacere.\nGiocatore Due: ");
+        if (versusHuman) {
+            System.out.print("-Giocatore Due: ");
+            System.out.print("\r");
             player2Name = sc.next();
             player2Name = player2Name.substring(0,1).toUpperCase() + player2Name.substring(1);
+
+            while (player1Name.equals(player2Name)) {
+                System.out.print("Il nome da lei inserito non è valido, lo reinserisca per piacere.\nGiocatore Due: ");
+                player2Name = sc.next();
+                player2Name = player2Name.substring(0,1).toUpperCase() + player2Name.substring(1);
+            }
         }
     }
 
+
+// ----------------------------- GAME -----------------------------
     public void startGame() {
         initializeBoard();
         setPlayerNames();
         printBoard();
         for (int i = 0; i < ROWS * COLS; i++) {
             turn = i + 1;
-            System.out.printf("Turno numero %s\n", turn);
-            System.out.printf("%s (%s), tocca a te!\n", turn % 2 == 0 ? player1Name : player2Name, turn % 2 == 0 ? otherToken : humanToken);
-            userChoice();
+            if (versusHuman) {
+                System.out.printf("Turno numero %s\n", turn);
+                System.out.printf("%s (%s), tocca a te!\n", turn % 2 == 0 ? player1Name : player2Name, turn % 2 == 0 ? otherToken : humanToken);
+                userChoice();
+            } else {
+                if (turn % 2 != 0){
+                    System.out.printf("Turno numero %s\n", turn);
+                    System.out.printf("%s (%s), tocca a te!\n", player1Name, humanToken);
+                    userChoice();
+                    /*try {
+                        TimeUnit.MILLISECONDS.sleep(60);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.out.print("\r");
+                    printBoard();*/
+                } else {
+                    System.out.printf("Turno numero %s\n", turn);
+                    System.out.printf("Il bot ha mosso (%s)!\n", otherToken);
+                    botChoice();
+                }
+            }
             try {
                 TimeUnit.MILLISECONDS.sleep(60);
             } catch (InterruptedException e) {
@@ -158,7 +211,7 @@ public class Board {
             System.out.print("\r");
             printBoard();
             if (hasWon()) {
-                System.out.printf("%s hai vinto!", turn % 2 == 0 ? player1Name : player2Name);
+                System.out.printf("%s hai vinto!", versusHuman ? turn % 2 == 0 ? player1Name : player2Name : turn % 2 == 0 ? player1Name : "Il bot");
                 return;
             }
         }
