@@ -1,7 +1,7 @@
 package me.zeld;
 
+import java.util.Random;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 public class Board {
     private final int ROWS = 6;
@@ -36,7 +36,7 @@ public class Board {
     }
 
     private void printBoard() {
-        System.out.println("┌------ FORZA QUATTRO ------┐");
+        System.out.println("\n┌------ FORZA QUATTRO ------┐");
         for (int i = 0; i < ROWS; i++) {
             /* per aggiungere una specie di animazione (loading...)
                 try {
@@ -122,40 +122,88 @@ public class Board {
     }
 
     // ----------------------------- BOT SETTING -----------------------------
-    private boolean checkVertical(int col, char tokenType){
-        int counter = 0;
-        int i;
-        for (i = ROWS - 1; i > 0 && BOARD[i][col] != '-'; i--) {
-            if(BOARD[i][col] == tokenType){
-                counter++;
-            }else{
-                counter = 0;
-            }
-        }
-        return counter == 3 && BOARD[i][col] == '-';
-    }
-
-    private boolean checkDiagonal(int col, char tokenType){
-        int counter = 0;
-        int i;
-        for (i = ROWS - 1; i > 0 && BOARD[i][col] != '-'; i--) {
+    private int possibleWinPosition(char token) {
+        Random r = new Random();
+        //verticale
+        for (int i = 0; i < ROWS - 3; i++) {
             for (int j = 0; j < COLS; j++) {
-                if(BOARD[i][j] == tokenType){
-                    counter++;
-                    break;
-                }else{
-                    counter = 0;
+                if (BOARD[i][j] == BOARD[i + 1][j] &&
+                        BOARD[i][j] == BOARD[i + 2][j] &&
+                        BOARD[i + 3][j] != token &&
+                        !thereIsToken(i,j)) {
+                    return j;
                 }
             }
         }
-        return counter == 3 && BOARD[i][col] == '-';
+        //orizzontale
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j] == BOARD[i][j + 1] &&
+                        BOARD[i][j] == BOARD[i][j + 2] &&
+                        BOARD[i][j + 3] != token &&
+                        !thereIsToken(i,j)) {
+                    return i + 3;
+                }
+            }
+        }
+
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j] == BOARD[i][j + 2] &&
+                        BOARD[i][j] == BOARD[i][j + 3] &&
+                        BOARD[i][j + 1] != token &&
+                        !thereIsToken(i,j)) {
+                    return j + 1;
+                }
+            }
+        }
+
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j] == BOARD[i][j + 1] &&
+                        BOARD[i][j] == BOARD[i][j + 3] &&
+                        BOARD[i][j + 2] != token &&
+                        !thereIsToken(i,j)) {
+                    return j + 2;
+                }
+            }
+        }
+
+        //diagonali
+        for (int i = 3; i < ROWS; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j] == BOARD[i - 1][j + 1] &&
+                        BOARD[i][j] == BOARD[i - 2][j + 2] &&
+                        BOARD[i - 3][j + 3] != token &&
+                        !thereIsToken(i,j)) {
+                    return i - 3;
+                }
+            }
+        }
+
+        for (int i = 0; i < ROWS - 3; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j] == BOARD[i + 1][j + 1] &&
+                        BOARD[i][j] == BOARD[i + 2][j + 2] &&
+                        BOARD[i + 3][j + 3] != token &&
+                        !thereIsToken(i,j)) {
+                    return j + 3;
+                }
+            }
+        }
+
+        return r.nextInt(0, COLS);
+    }
+
+    public void botChoice(){
+        boolean canInsert = insertDisc(possibleWinPosition(turn % 2 != 0 ? humanToken : otherToken));
+        System.out.println(possibleWinPosition(turn % 2 != 0 ? humanToken : otherToken));
+        while (!canInsert) {
+            canInsert = insertDisc(possibleWinPosition(turn % 2 != 0 ? humanToken : otherToken));
+        }
     }
 
 
-    private void botChoice(){
-        System.out.println(checkVertical(6, otherToken) + " si ");
-        System.out.println(checkDiagonal(6, otherToken) + " si ");
-    }
 // ----------------------------- USER INFO -----------------------------
 
     private void userChoice() {
@@ -205,27 +253,13 @@ public class Board {
                     System.out.printf("Turno numero %s\n", turn);
                     System.out.printf("%s (%s), tocca a te!\n", player1Name, humanToken);
                     userChoice();
-                    /*
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(60);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    System.out.print("\r");
-                    printBoard();
-                    */
+                    //printBoard();
                 } else {
                     System.out.printf("Turno numero %s\n", turn);
-                    System.out.printf("Il bot ha mosso (%s)!\n", otherToken);
+                    System.out.printf("Il bot ha fatto la sua mossa(%s)!\n", otherToken);
                     botChoice();
                 }
             }
-            try {
-                TimeUnit.MILLISECONDS.sleep(60);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.print("\r");
             printBoard();
             if (hasWon()) {
                 System.out.printf("%s hai vinto!", versusHuman ? turn % 2 == 0 ? player1Name : player2Name : turn % 2 != 0 ? player1Name : "Il bot");
