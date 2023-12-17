@@ -121,7 +121,7 @@ public class Board {
         return false;
     }
 
-    // ----------------------------- BOT SETTING -----------------------------
+    // TODO: ----------------------------- BOT SETTING -----------------------------
     private int possibleWinPosition(char token) {
         Random r = new Random();
         //verticale
