@@ -58,7 +58,7 @@ public class Board {
     // ----------------------------- CHECKS -----------------------------
     private boolean insertDisc(int col) {
         for (int i = ROWS - 1; i >= 0; i--) {
-            if (thereIsToken(i,col)) {
+            if (thereIsToken(i, col)) {
                 BOARD[i][col] = turn % 2 == 0 ? otherToken : humanToken;
                 return true;
             }
@@ -66,7 +66,7 @@ public class Board {
         return false;
     }
 
-    private boolean thereIsToken(int row, int col){
+    private boolean thereIsToken(int row, int col) {
         return BOARD[row][col] == defaultEmptySpace;
     }
 
@@ -78,7 +78,7 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i + 1][j] &&
                         BOARD[i][j] == BOARD[i + 2][j] &&
                         BOARD[i][j] == BOARD[i + 3][j] &&
-                        !thereIsToken(i,j)) {
+                        !thereIsToken(i, j)) {
                     return true;
                 }
             }
@@ -90,7 +90,7 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i][j + 1] &&
                         BOARD[i][j] == BOARD[i][j + 2] &&
                         BOARD[i][j] == BOARD[i][j + 3] &&
-                        !thereIsToken(i,j)) {
+                        !thereIsToken(i, j)) {
                     return true;
                 }
             }
@@ -102,7 +102,7 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i - 1][j + 1] &&
                         BOARD[i][j] == BOARD[i - 2][j + 2] &&
                         BOARD[i][j] == BOARD[i - 3][j + 3] &&
-                        !thereIsToken(i,j)) {
+                        !thereIsToken(i, j)) {
                     return true;
                 }
             }
@@ -113,7 +113,7 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i + 1][j + 1] &&
                         BOARD[i][j] == BOARD[i + 2][j + 2] &&
                         BOARD[i][j] == BOARD[i + 3][j + 3] &&
-                        !thereIsToken(i,j)) {
+                        !thereIsToken(i, j)) {
                     return true;
                 }
             }
@@ -129,8 +129,7 @@ public class Board {
             for (int j = 0; j < COLS; j++) {
                 if (BOARD[i][j] == BOARD[i + 1][j] &&
                         BOARD[i][j] == BOARD[i + 2][j] &&
-                        BOARD[i + 3][j] != token &&
-                        !thereIsToken(i,j)) {
+                        !thereIsToken(i + 3, j)) {
                     return j;
                 }
             }
@@ -141,8 +140,19 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i][j + 1] &&
                         BOARD[i][j] == BOARD[i][j + 2] &&
                         BOARD[i][j + 3] != token &&
-                        !thereIsToken(i,j)) {
-                    return i + 3;
+                        !thereIsToken(i, j)) {
+                    return j;
+                }
+            }
+        }
+
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS - 3; j++) {
+                if (BOARD[i][j + 1] == BOARD[i][j + 2] &&
+                        BOARD[i][j + 1] == BOARD[i][j + 3] &&
+                        BOARD[i][j] != token &&
+                        !thereIsToken(i, j + 3)) {
+                    return j + 3;
                 }
             }
         }
@@ -152,7 +162,7 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i][j + 2] &&
                         BOARD[i][j] == BOARD[i][j + 3] &&
                         BOARD[i][j + 1] != token &&
-                        !thereIsToken(i,j)) {
+                        !thereIsToken(i, j)) {
                     return j + 1;
                 }
             }
@@ -163,7 +173,7 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i][j + 1] &&
                         BOARD[i][j] == BOARD[i][j + 3] &&
                         BOARD[i][j + 2] != token &&
-                        !thereIsToken(i,j)) {
+                        !thereIsToken(i, j)) {
                     return j + 2;
                 }
             }
@@ -175,8 +185,8 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i - 1][j + 1] &&
                         BOARD[i][j] == BOARD[i - 2][j + 2] &&
                         BOARD[i - 3][j + 3] != token &&
-                        !thereIsToken(i,j)) {
-                    return i - 3;
+                        !thereIsToken(i, j)) {
+                    return j + 3;
                 }
             }
         }
@@ -186,7 +196,7 @@ public class Board {
                 if (BOARD[i][j] == BOARD[i + 1][j + 1] &&
                         BOARD[i][j] == BOARD[i + 2][j + 2] &&
                         BOARD[i + 3][j + 3] != token &&
-                        !thereIsToken(i,j)) {
+                        !thereIsToken(i, j)) {
                     return j + 3;
                 }
             }
@@ -195,7 +205,7 @@ public class Board {
         return r.nextInt(0, COLS);
     }
 
-    public void botChoice(){
+    public void botChoice() {
         boolean canInsert = insertDisc(possibleWinPosition(turn % 2 != 0 ? humanToken : otherToken));
         System.out.println(possibleWinPosition(turn % 2 != 0 ? humanToken : otherToken));
         while (!canInsert) {
@@ -220,18 +230,18 @@ public class Board {
         Scanner sc = new Scanner(System.in);
         System.out.print(versusHuman ? "-Giocatore Uno: " : "Nome Giocatore: ");
         player1Name = sc.next();
-        player1Name = player1Name.substring(0,1).toUpperCase() + player1Name.substring(1);
+        player1Name = player1Name.substring(0, 1).toUpperCase() + player1Name.substring(1);
 
         if (versusHuman) {
             System.out.print("-Giocatore Due: ");
             System.out.print("\r");
             player2Name = sc.next();
-            player2Name = player2Name.substring(0,1).toUpperCase() + player2Name.substring(1);
+            player2Name = player2Name.substring(0, 1).toUpperCase() + player2Name.substring(1);
 
             while (player1Name.equals(player2Name)) {
                 System.out.print("Il nome da lei inserito non è valido, lo reinserisca per piacere.\nGiocatore Due: ");
                 player2Name = sc.next();
-                player2Name = player2Name.substring(0,1).toUpperCase() + player2Name.substring(1);
+                player2Name = player2Name.substring(0, 1).toUpperCase() + player2Name.substring(1);
             }
         }
     }
@@ -249,7 +259,7 @@ public class Board {
                 System.out.printf("%s (%s), tocca a te!\n", turn % 2 == 0 ? player1Name : player2Name, turn % 2 == 0 ? otherToken : humanToken);
                 userChoice();
             } else {
-                if (turn % 2 != 0){
+                if (turn % 2 != 0) {
                     System.out.printf("Turno numero %s\n", turn);
                     System.out.printf("%s (%s), tocca a te!\n", player1Name, humanToken);
                     userChoice();
